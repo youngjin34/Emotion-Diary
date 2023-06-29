@@ -1,11 +1,10 @@
-import MyHeader from '../components/MyHeader';
+import DiaryEditor from "../components/DiaryEditor";
+
 
 const New = () => {
-  return (
-    <div>
-      <MyHeader headText={"새 일기 쓰기"} />
-    </div>
-  )
+  return <div>
+    <DiaryEditor />
+  </div>
 };
 
 export default New;
