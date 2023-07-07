@@ -1,5 +1,4 @@
-import React, { useReducer, useRef } from "react";
-
+import React, { useEffect, useReducer, useRef } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -33,58 +32,32 @@ const reducer = (state, action) => {
     default:
       return state;
   }
+  localStorage.setItem('diary', JSON.stringify(newState));
   return newState;
 };
 
 export const DiaryStateContext = React.createContext();
 export const DiaryDispatchContext = React.createContext();
 
-const dummyData = [
-  {
-    id: 1,
-    title: "일기",
-    emotion: 1,
-    content: "일기 만든다 어쩔?",
-    date: 1687911375939
-  },
-  {
-    id: 2,
-    title: "일기2",
-    emotion: 2,
-    content: "일기 만든2다 어쩔?",
-    date: 1687911375940
-  },
-  {
-    id: 3,
-    title: "일기3",
-    emotion: 3,
-    content: "일기 만든다 어쩔?zzz",
-    date: 1687911375941
-  },
-  {
-    id: 4,
-    title: "일기4",
-    emotion: 4,
-    content: "일기 만든다 어쩔?",
-    date: 1687911375942
-  },
-  {
-    id: 5,
-    title: "일기5",
-    emotion: 5,
-    content: "일기 만든다 어쩔?",
-    date: 16879113759343
-  },
-];
-
 function App() {
+  useEffect(() => {
+    const localData = localStorage.getItem('diary');
+    if (localData) {
+      const diaryList = JSON.parse(localData).sort((a, b) => parseInt(b.id) - parseInt(a.id));
+      if (diaryList.length >= 1) {
+        dataId.current = parseInt(diaryList[0].id + 1);
+        dispatch({ type: "INIT", data: diaryList });
+      }
+    }
+  }, []);
 
-  const [data, dispatch] = useReducer(reducer, dummyData);
+  const [data, dispatch] = useReducer(reducer, []);
   const dataId = useRef(0);
 
-  const onCreate = (title, date, content, emotion) => {
+  const onCreate = (date, title, content, emotion) => {
     dispatch({
-      type: "CREATE", data: {
+      type: "CREATE",
+      data: {
         id: dataId.current,
         date: new Date(date).getTime(),
         title,
@@ -121,7 +94,7 @@ function App() {
             <Routes>
               <Route path='/' element={<Home />} />
               <Route path='/new' element={<New />} />
-              <Route path='/edit' element={<Edit />} />
+              <Route path='/edit/:id' element={<Edit />} />
               <Route path='/diary/:id' element={<Diary />} />
               {/* <Route path='/diary' element={<Diary />} />  
           를 넣으면 :id가 없는 diary 첫 페이지로 간다. */}
